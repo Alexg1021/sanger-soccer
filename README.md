@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sanger Varsity Boys Soccer
 
-## Getting Started
+Next.js 16 + Supabase (Postgres, Storage). One open player-profile form, a public schedule with calendar feed,
+approved-only public player pages, and a passcode-protected coach dashboard.
 
-First, run the development server:
+## Pages
+| Route | What |
+|---|---|
+| `/join` | Open player form (team code required): base info, profile, goals/intentions, photo, social permission |
+| `/schedule` | Public schedule: list + month view. `/schedule/ics` is a subscribable calendar feed |
+| `/players`, `/players/[id]` | Public profiles. Only players you **approve** who gave photo permission. First name + last initial only. No contact info |
+| `/coach` | Passcode-protected: see submissions, approve/unapprove/hide/delete |
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Setup
+1. Create a Supabase project. In the SQL editor, run `supabase/migrations/0001_init.sql`.
+2. `cp .env.example .env.local` and fill it in (Supabase URL + service-role key, `TEAM_CODE`, `COACH_PASSCODE`,
+   `SESSION_SECRET` from `openssl rand -hex 32`).
+3. `npm run dev` and open http://localhost:3000
+4. Import the schedule: `npx tsx scripts/import-schedule.ts path/to/schedule.csv --dry-run`, then without `--dry-run`.
+   Columns are matched by name (date, time, opponent/title, location, type, notes, visibility); see `data/sample-schedule.csv`.
+   Re-importing updates events matched on date + title.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Security model
+- RLS is on with **no policies**: the browser/anon key can't touch any table. All reads/writes go through server code
+  using the service-role key (server-only; never `NEXT_PUBLIC_`).
+- Public pages select an explicit column allow-list; contact info, parent info and internal event notes never leave the server.
+- The photo bucket is private; images are served via 1-hour signed URLs.
+- The form is protected by the team code, a honeypot field, a best-effort rate limit, and a unique-email constraint.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Not built yet
+Player account creation (magic link / Google), team-only schedule view, staff table UI, GroupMe posting, AI tasks.
