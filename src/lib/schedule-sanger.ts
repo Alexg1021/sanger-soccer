@@ -62,6 +62,7 @@ export function parseSangerSheet(csv: string): { events: EventRow[]; problems: s
   const headerIdx = rows.findIndex((r) => r[0]?.toLowerCase() === "date" && r.some((c) => c.toLowerCase() === "teams"));
   if (headerIdx < 0) return { events, problems: ["Couldn't find the header row (Date ... Teams ...)"] };
 
+  const visIdx = rows[headerIdx].findIndex((c) => c.toLowerCase() === "visibility"); // optional column: public | team | staff
   let undated = 0;
 
   for (let i = headerIdx + 1; i < rows.length; i++) {
@@ -124,7 +125,7 @@ export function parseSangerSheet(csv: string): { events: EventRow[]; problems: s
       title,
       location: loc || null,
       notes: note || null,
-      visibility: "public",
+      visibility: ((v) => (v === "team" || v === "staff" ? v : "public"))((visIdx >= 0 ? r[visIdx] : "")?.toLowerCase()),
       source_key: key(String(d.start), type, school || "tbd"),
     });
   }

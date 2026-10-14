@@ -9,6 +9,7 @@ approved-only public player pages, and a passcode-protected coach dashboard.
 | `/join` | Open player form (team code required): base info, profile, goals/intentions, photo, social permission |
 | `/schedule` | Public schedule: list + month view. `/schedule/ics` is a subscribable calendar feed |
 | `/players`, `/players/[id]` | Public profiles. Only players you **approve** who gave photo permission. First name + last initial only. No contact info |
+| `/team` | Team-code-protected schedule: public + team-only events, with notes |
 | `/coach` | Passcode-protected: see submissions, approve/unapprove/hide/delete |
 
 ## Setup
@@ -28,4 +29,10 @@ approved-only public player pages, and a passcode-protected coach dashboard.
 - The form is protected by the team code, a honeypot field, a best-effort rate limit, and a unique-email constraint.
 
 ## Not built yet
-Player account creation (magic link / Google), team-only schedule view, staff table UI, GroupMe posting, AI tasks.
+Player accounts (magic link / Google), staff table UI, reading GroupMe messages, AI tasks.
+
+## GroupMe
+Create a bot at dev.groupme.com (Bots -> Create Bot, pick the group) and put its Bot ID in `GROUPME_BOT_ID`.
+`npx tsx scripts/groupme-post.ts "message"` previews; add `--send` to post. Max 1000 chars.
+
+The season importer also reads an optional `Visibility` column (public | team | staff) and the trailing notes column.

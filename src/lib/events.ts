@@ -30,3 +30,16 @@ export const fmtTime = (iso: string) =>
 
 export const fmtDay = (iso: string) =>
   new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric" }).format(new Date(iso));
+
+export type TeamEvent = PublicEvent & { notes: string | null };
+
+/** Team view: public + team-only events, including notes. Call only after checking isTeamMember(). */
+export async function teamEvents(): Promise<TeamEvent[]> {
+  const { data, error } = await db()
+    .from("events")
+    .select("id, starts_at, ends_at, all_day, type, title, location, notes")
+    .in("visibility", ["public", "team"])
+    .order("starts_at");
+  if (error) throw error;
+  return data ?? [];
+}

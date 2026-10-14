@@ -7,6 +7,7 @@ export default function Home() {
       <ul className="mt-8 space-y-3 text-lg">
         <li><Link className="underline" href="/schedule">Schedule</Link></li>
         <li><Link className="underline" href="/players">Meet the team</Link></li>
+        <li><Link className="underline" href="/team">Team schedule (players)</Link></li>
         <li><Link className="underline" href="/join">Player profile form</Link></li>
       </ul>
     </main>
