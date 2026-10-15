@@ -3,12 +3,11 @@
 import { useActionState } from "react";
 import { submitProfile, type JoinState } from "./actions";
 import { POSITIONS } from "@/lib/profile-schema";
-import { resizeImage } from "@/lib/resize-image";
+import { PhotoInput } from "@/components/photo-input";
 
 const initial: JoinState = { ok: false };
 
-const input =
-  "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 focus:border-red-700 focus:outline-none focus:ring-1 focus:ring-red-700";
+const input = "input";
 
 function Field({
   label,
@@ -139,24 +138,7 @@ export function JoinForm() {
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Your profile</h2>
         <Field label="Photo (optional)" name="photo" error={e.photo} hint="Clear, action or portrait shot. Big photos are shrunk automatically.">
-          <input
-            id="photo"
-            name="photo"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            className="text-sm"
-            onChange={async (ev) => {
-              const input = ev.currentTarget;
-              const file = input.files?.[0];
-              if (!file) return;
-              const small = await resizeImage(file);
-              if (small !== file) {
-                const dt = new DataTransfer();
-                dt.items.add(small);
-                input.files = dt.files;
-              }
-            }}
-          />
+          <PhotoInput />
         </Field>
         <Field label="Short bio" name="bio" error={e.bio}>
           <textarea id="bio" name="bio" rows={3} className={input} />
@@ -213,7 +195,7 @@ export function JoinForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-red-700 px-4 py-3 font-semibold text-white hover:bg-red-800 disabled:opacity-60"
+        className="btn w-full py-3"
       >
         {pending ? "Submitting…" : "Submit my profile"}
       </button>

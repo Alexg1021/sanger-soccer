@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const POSITIONS = ["GK", "CB", "FB", "CDM", "CM", "CAM", "Winger", "ST"] as const;
 
-const text = (max: number) => z.string().trim().max(max).optional().transform((v) => v || undefined);
+export const text = (max: number) => z.string().trim().max(max).optional().transform((v) => v || undefined);
 
 export const profileSchema = z.object({
   teamCode: z.string().trim().min(1, "Enter the team code"),

@@ -29,7 +29,7 @@ function MonthGrid({ events, month }: { events: PublicEvent[]; month: string }) 
           <div key={i} className="min-h-20 bg-white p-1">
             {day && <div className="text-xs text-zinc-500">{day}</div>}
             {list.map((e) => (
-              <div key={e.id} className="mt-0.5 truncate rounded bg-red-100 px-1 text-xs text-red-900" title={e.title}>
+              <div key={e.id} className="mt-0.5 truncate rounded bg-brand-tint px-1 text-xs text-brand-dark" title={e.title}>
                 {e.title}
               </div>
             ))}
@@ -58,7 +58,7 @@ async function Schedule({ searchParams }: { searchParams: Promise<{ view?: strin
       <div className="mb-6 flex flex-wrap items-center gap-3 text-sm">
         <Link href="/schedule" className={view !== "month" ? "font-semibold underline" : ""}>List</Link>
         <Link href="/schedule?view=month" className={view === "month" ? "font-semibold underline" : ""}>Month</Link>
-        <a href="/schedule/ics" className="ml-auto text-red-700 underline">Add to my calendar (.ics)</a>
+        <a href="/schedule/ics" className="ml-auto text-brand underline">Add to my calendar (.ics)</a>
       </div>
 
       {view === "month" ? (

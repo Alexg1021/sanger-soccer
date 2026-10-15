@@ -43,3 +43,20 @@ export async function teamEvents(): Promise<TeamEvent[]> {
   if (error) throw error;
   return data ?? [];
 }
+
+/** Pacific date ("2026-12-02") and time ("15:30") parts for form inputs. */
+export function pacificParts(iso: string) {
+  const d = new Date(iso);
+  const time = new Intl.DateTimeFormat("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
+  return { date: dayKey(iso), time };
+}
+
+/** Staff view: every event regardless of visibility. Call only after checking the staff role. */
+export async function staffEvents(): Promise<TeamEvent[]> {
+  const { data, error } = await db()
+    .from("events")
+    .select("id, starts_at, ends_at, all_day, type, title, location, notes")
+    .order("starts_at");
+  if (error) throw error;
+  return data ?? [];
+}

@@ -36,17 +36,24 @@ if (!url || !key) {
   process.exit(1);
 }
 async function main() {
-  const { error } = await createClient(url!, key!, { auth: { persistSession: false } })
-    .from("events")
-    .upsert(events, { onConflict: "source_key" });
+  const supabase = createClient(url!, key!, { auth: { persistSession: false } });
+
+  // Events edited by hand in the dashboard are left alone. (Column exists after migration 0002.)
+  const { data: edited, error: editedErr } = await supabase.from("events").select("source_key").eq("manually_edited", true);
+  const protectedKeys = new Set((edited ?? []).map((e) => e.source_key).filter(Boolean));
+  if (editedErr) console.warn("note: couldn't check manually edited events (run migration 0002?):", editedErr.message);
+  const toWrite = events.filter((e) => !protectedKeys.has(e.source_key));
+  if (protectedKeys.size) console.log(`Skipping ${events.length - toWrite.length} hand-edited event(s).`);
+
+  const { error } = await supabase.from("events").upsert(toWrite, { onConflict: "source_key" });
   if (error) {
     console.error("Import failed:", error.message);
     process.exit(1);
   }
   console.log("Imported.");
   if (flags.includes("--replace")) {
-    const keep = events.map((e) => e.source_key);
-    const { data, error: delErr } = await createClient(url!, key!, { auth: { persistSession: false } })
+    const keep = [...events.map((e) => e.source_key), ...protectedKeys];
+    const { data, error: delErr } = await supabase
       .from("events")
       .delete()
       .not("source_key", "in", `(${keep.join(",")})`)

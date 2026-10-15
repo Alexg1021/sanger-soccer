@@ -10,16 +10,22 @@ approved-only public player pages, and a passcode-protected coach dashboard.
 | `/schedule` | Public schedule: list + month view. `/schedule/ics` is a subscribable calendar feed |
 | `/players`, `/players/[id]` | Public profiles. Only players you **approve** who gave photo permission. First name + last initial only. No contact info |
 | `/team` | Team-code-protected schedule: public + team-only events, with notes |
-| `/coach` | Passcode-protected: see submissions, approve/unapprove/hide/delete |
+| `/coach` | Coach dashboard (coach passcode): stats, who hasn't submitted, sortable roster, CSV export |
+| `/coach/players/[id]`, `/coach/players/new` | Read/edit a full profile, approve, delete, add a player by hand |
+| `/coach/events` | Add/edit/delete events (visibility: public/team/staff, notes, times in Pacific) |
+| `/coach/staff` | Coaches and managers |
+| `/coach/expected` | Paste expected roster names to track who is missing |
+| `/staff` | Assistant area (assistant passcode or coach): schedule with notes, roster profiles, staff. No emails/phones/parent info |
 
 ## Setup
+0. Run both migrations in order in the Supabase SQL editor: `0001_init.sql`, then `0002_dashboard.sql`.
 1. Create a Supabase project. In the SQL editor, run `supabase/migrations/0001_init.sql`.
 2. `cp .env.example .env.local` and fill it in (Supabase URL + service-role key, `TEAM_CODE`, `COACH_PASSCODE`,
    `SESSION_SECRET` from `openssl rand -hex 32`).
 3. `npm run dev` and open http://localhost:3000
 4. Import the schedule: `npx tsx scripts/import-schedule.ts path/to/schedule.csv --dry-run`, then without `--dry-run`.
    Columns are matched by name (date, time, opponent/title, location, type, notes, visibility); see `data/sample-schedule.csv`.
-   Re-importing updates events matched on date + title.
+   Re-importing updates events matched on date + title, except events you edited by hand in `/coach/events` (they're left alone).
 
 ## Security model
 - RLS is on with **no policies**: the browser/anon key can't touch any table. All reads/writes go through server code
@@ -29,7 +35,7 @@ approved-only public player pages, and a passcode-protected coach dashboard.
 - The form is protected by the team code, a honeypot field, a best-effort rate limit, and a unique-email constraint.
 
 ## Not built yet
-Player accounts (magic link / Google), staff table UI, reading GroupMe messages, AI tasks.
+Player accounts (magic link / Google), training plans, trip/showcase planning, marketing calendar, reading GroupMe messages, AI tasks.
 
 ## GroupMe
 Create a bot at dev.groupme.com (Bots -> Create Bot, pick the group) and put its Bot ID in `GROUPME_BOT_ID`.
