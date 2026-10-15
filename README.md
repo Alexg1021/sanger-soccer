@@ -18,7 +18,7 @@ approved-only public player pages, and a passcode-protected coach dashboard.
 | `/staff` | Assistant area (assistant passcode or coach): schedule with notes, roster profiles, staff. No emails/phones/parent info |
 
 ## Setup
-0. Run both migrations in order in the Supabase SQL editor: `0001_init.sql`, then `0002_dashboard.sql`.
+0. Apply migrations with `npm run migrate` (needs `SUPABASE_DB_URL` in `.env.local`; `--dry-run` previews). Or paste each file in `supabase/migrations/` into the Supabase SQL editor, in order.
 1. Create a Supabase project. In the SQL editor, run `supabase/migrations/0001_init.sql`.
 2. `cp .env.example .env.local` and fill it in (Supabase URL + service-role key, `TEAM_CODE`, `COACH_PASSCODE`,
    `SESSION_SECRET` from `openssl rand -hex 32`).
